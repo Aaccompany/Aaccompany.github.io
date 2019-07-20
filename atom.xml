@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2019-07-10T05:10:42.935Z</updated>
+  <updated>2019-07-14T12:02:48.813Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -15,6 +15,58 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>重走框架系列说明</title>
+    <link href="http://yoursite.com/2019/07/14/%E9%87%8D%E8%B5%B0%E6%A1%86%E6%9E%B6%E7%B3%BB%E5%88%97%E8%AF%B4%E6%98%8E/"/>
+    <id>http://yoursite.com/2019/07/14/重走框架系列说明/</id>
+    <published>2019-07-14T11:47:47.000Z</published>
+    <updated>2019-07-14T12:02:48.813Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="重走框架系列说明"><a href="#重走框架系列说明" class="headerlink" title="重走框架系列说明"></a>重走框架系列说明</h1><h2 id="自我反思"><a href="#自我反思" class="headerlink" title="自我反思"></a>自我反思</h2><p>由于思想觉悟出现了问题，总想着快点学习，却没有想到丢了芝麻也丢了西瓜。</p><p>自己的基础严重的不牢固，导致前进的十分缓慢。又看了许多大神的教学视频，感觉自己依旧十分的弟弟，所以觉得自己有点揠苗助长，故有了重走框架系列，希望自己能够在这次重新学习后端框架的时候能够不断发现自己的知识盲区，找到自己的不足。</p><p>在重走框架的道路上，希望能够借助自己做的项目中，仔细思考在项目中引入新的后端框架会对系统增加严重的BUG，以及对这些BUG如何去做到预防以及解决。</p><p>借用《劝学》</p><p>故不积跬步，无以至千里，不积小流，无以成江海。</p><p>望自己能够一直记住。</p><p><img src="/2019/07/14/重走框架系列说明/1.gif" alt></p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h1 id=&quot;重走框架系列说明&quot;&gt;&lt;a href=&quot;#重走框架系列说明&quot; class=&quot;headerlink&quot; title=&quot;重走框架系列说明&quot;&gt;&lt;/a&gt;重走框架系列说明&lt;/h1&gt;&lt;h2 id=&quot;自我反思&quot;&gt;&lt;a href=&quot;#自我反思&quot; class=&quot;headerlink&quot; 
+      
+    
+    </summary>
+    
+      <category term="杂谈" scheme="http://yoursite.com/categories/%E6%9D%82%E8%B0%88/"/>
+    
+    
+      <category term="杂谈" scheme="http://yoursite.com/tags/%E6%9D%82%E8%B0%88/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>重走spring框架</title>
+    <link href="http://yoursite.com/2019/07/14/%E9%87%8D%E8%B5%B0spring%E6%A1%86%E6%9E%B6/"/>
+    <id>http://yoursite.com/2019/07/14/重走spring框架/</id>
+    <published>2019-07-14T11:40:50.000Z</published>
+    <updated>2019-07-14T14:51:42.651Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="Spring框架"><a href="#Spring框架" class="headerlink" title="Spring框架"></a>Spring框架</h1><h2 id="1-Spring到底是个什么妖魔鬼怪？"><a href="#1-Spring到底是个什么妖魔鬼怪？" class="headerlink" title="1.Spring到底是个什么妖魔鬼怪？"></a>1.Spring到底是个什么妖魔鬼怪？</h2><h3 id="1-1-Spring的自我介绍？"><a href="#1-1-Spring的自我介绍？" class="headerlink" title="1.1.Spring的自我介绍？"></a>1.1.Spring的自我介绍？</h3><p>1）Spring是分层的 Java SE/EE应用 <strong>full-stack</strong> （提供了全栈式的解决方案）轻量级开源框架</p><p>2）以 <strong>IoC</strong>（Inverse Of Control： 反转控制）和 <strong>AOP</strong>（Aspect Oriented Programming：面向切面编程）为<strong>内核</strong></p><p>3）提供了展现层 Spring MVC 和持久层 Spring JDBC 以及业务层事务管理等众多的企业级应用技术，还能整合开源世界众多 著名的第三方框架和类库</p><p>4）Java后端开发的标准 </p><h3 id="1-2-Spring的发展历程"><a href="#1-2-Spring的发展历程" class="headerlink" title="1.2.Spring的发展历程"></a>1.2.Spring的发展历程</h3><p>1997 年 IBM提出了EJB 的思想   </p><p>1998 年，SUN制定开发标准规范 EJB1.0   </p><p>1999 年，EJB1.1 发布   </p><p>2001 年，EJB2.0 发布   </p><p>2003 年，EJB2.1 发布   </p><p>2006 年，EJB3.0 发布   </p><p><strong>Rod Johnson（spring之父）</strong>   </p><p> Expert One-to-One J2EE Design and Development(2002)    阐述了 J2EE 使用EJB 开发设计的优点及解决方案   </p><p> Expert One-to-One J2EE Development without EJB(2004)    阐述了 J2EE 开发不使用 EJB的解决方式（Spring 雏形）      </p><p>2017 年 9 月份发布了 spring 的最新版本 spring 5.0 通用版（GA） </p><h3 id="1-3-为什么要使用Spring？"><a href="#1-3-为什么要使用Spring？" class="headerlink" title="1.3.为什么要使用Spring？"></a>1.3.为什么要使用Spring？</h3><p>1）方便解耦，简化开发</p><p>通过Spring提供的IOC（控制反转）容器，让Bean对象放入到Spring容器中，这样对象之间的依赖关系就可以由Spring去处理，避免硬编码造成程序耦合。也不需要注重Bean是设计成单例还是设计成多例的代码。可以花更多时间去注重上层代码</p><p>2）AOP支持(面向切面)</p><p>通过Spring提供的AOP支持，可以做到传统的OOP很难完成事情。</p><p>3）声明式事务的支持</p><p>可以将我们从单调烦闷的事务管理代码中解脱出来，通过声明式方式灵活的进行事务的管理， 提高开发效率和质量。 </p><p>4）方便程序的测试 </p><p> 可以用非容器依赖的编程方式进行几乎所有的测试工作，测试不再是昂贵的操作，而是随手可 做的事情</p><p>5）方便集合各种优秀的框架</p><p>可以很快的整合Mybatis、Spring MVC 、Struts等框架。</p><p>6）降低了Java EE的API使用难度</p><p>在Spring中，对Java EE（如 JDBC、JavaMail、远程调用等）进行了一层封装，能够通过更少的代码去使用这些技术。</p><p>7）代码编写的榜样</p><p>Spring采用的代码编写的技巧，设计都十分巧妙，结构清晰，注释完整。是十分值得学习的榜样。</p><h3 id="1-4-Spring的体系结构"><a href="#1-4-Spring的体系结构" class="headerlink" title="1.4.Spring的体系结构"></a>1.4.Spring的体系结构</h3><p>在Spring的体系结构中也可以看出Spring是个<strong>full-stack</strong>型框架，提供了各层的解决方案。</p><p>其中重要的是Core Container中的部分，这是使用Spring必备部分，不可缺失。</p><p><img src="/2019/07/14/重走spring框架/spring-overview.png" alt></p><h2 id="2-IOC是个什么玩意？"><a href="#2-IOC是个什么玩意？" class="headerlink" title="2.IOC是个什么玩意？"></a>2.IOC是个什么玩意？</h2><h3 id="2-1-程序的耦合和解耦"><a href="#2-1-程序的耦合和解耦" class="headerlink" title="2.1.程序的耦合和解耦"></a>2.1.程序的耦合和解耦</h3><p>在说明IOC先知道什么是程序的耦合和耦合</p><h4 id="2-1-1-程序的耦合？"><a href="#2-1-1-程序的耦合？" class="headerlink" title="2.1.1.程序的耦合？"></a>2.1.1.程序的耦合？</h4><p>在软件工程中，耦合指的就是就是对象之间的依赖性。对象之间的耦合越高，维护成本越高。因此对象的设计应使类和构件之间的耦合最小。软件设计中通常用耦合度和内聚度作为衡量模块独立程度的标准。划分模块的一个 准则就是高内聚低耦合。</p><p> 它有如下分类： </p><p>模块耦合分为<strong>数据耦合、特征耦合、控制耦合、公共环境耦合、内容耦合</strong>。耦合程度由低到高。</p><p><strong>1）数据耦合：</strong></p><p>两个模块彼此间通过参数交换信息，而且交换的信息仅仅是数据（指的是单一的原子的数据片段），那么这种耦合称为数据耦合。<strong>数据耦合是低耦合。系统中至少必须存在这种耦合。这是不可避免的。</strong></p><p><strong>2）特征耦合</strong></p><p>当把整个<strong>数据结构</strong>作为参数、局部变量或者返回值，而被调用的模块只需要使用其中一部分数据元素时，就出现了特征耦合。（意思为传递了一个数据结构，但是调用方没有将该数据结构中全部数据使用便为特征耦合）</p><p>比如判断一个人是否成年，只需要传递该人的出生日期即可，不必要把人传进去。</p><p>因此这种耦合，通常是可以通过修改参数、局部变量或者返回值，只使用必要的数据元素来避免。</p><p><strong>3）控制耦合</strong></p><p>传递的信息中有控制信息(尽管有时这种控制信息以数据的形式出现)，则这种耦合称为控制耦合。控制耦合是中等程度的耦合。</p><p>比如，传递的参数中包含一个枚举类型的参数，在方法的具体逻辑中判断该参数实现不同的功能。<br>那么，完全可以通过将一个方法修改为多个方法改进这种耦合。</p><p><strong>4）公共环境耦合</strong></p><p>当两个或多个模块通过一个公共数据环境相互作用时，它们之间的耦合称为公共环境耦合。<br>公共环境可以是全程变量、共享的通信区、内存的公共覆盖区、任何存储介质上的文件、物理设备等。<br>公共环境耦合的复杂程度随耦合的模块个数而变化，当耦合的模块个数增加时复杂程度显著增加。</p><p>只有两个模块有公共环境，耦合有下面两种可能。</p><ol><li>一个模块往公共环境送数据，另一个模块从公共环境取数据。这是数据耦合的一种形式，是比较松散的耦合。</li><li>两个模块都既往公共环境送数据又从里面取数据，这种耦合比较紧密，介于数据耦合和控制耦合之间。</li></ol><p>限制范围，比如如果是依赖的是汇率，提供一个统一获汇率配置的方法，限制耦合范围。</p><p><strong>5）内容耦合</strong></p><p>最高程度的耦合是内容耦合。如果出现下列情况之一，两个模块间就发生了内容耦合。</p><ol><li>一个模块访问另一个模块的内部数据。</li><li>一个模块不通过正常入口而转到另一个模块的内部。</li><li>两个模块有一部分程序代码重叠(只可能出现在汇编程序中)。</li><li>一个模块有多个入口(这意味着一个模块有几种功能)。</li></ol><p>应该坚决避免使用内容耦合，重构吧。</p><h3 id="耦合总结"><a href="#耦合总结" class="headerlink" title="耦合总结"></a>耦合总结</h3><p>总之，耦合是影响软件复杂程度的一个重要因素。<br>应该采取下述设计原则：<br><strong>尽量使用数据耦合，少用控制耦合和特征耦合，限制公共环境耦合的范围，完全不用内容耦合。</strong></p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h1 id=&quot;Spring框架&quot;&gt;&lt;a href=&quot;#Spring框架&quot; class=&quot;headerlink&quot; title=&quot;Spring框架&quot;&gt;&lt;/a&gt;Spring框架&lt;/h1&gt;&lt;h2 id=&quot;1-Spring到底是个什么妖魔鬼怪？&quot;&gt;&lt;a href=&quot;#1-Spring到底
+      
+    
+    </summary>
+    
+      <category term="后端框架" scheme="http://yoursite.com/categories/%E5%90%8E%E7%AB%AF%E6%A1%86%E6%9E%B6/"/>
+    
+    
+      <category term="spring" scheme="http://yoursite.com/tags/spring/"/>
+    
+      <category term="重走系列" scheme="http://yoursite.com/tags/%E9%87%8D%E8%B5%B0%E7%B3%BB%E5%88%97/"/>
+    
+  </entry>
   
   <entry>
     <title>MQ知其然而不知其所然</title>
