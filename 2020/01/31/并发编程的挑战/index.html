@@ -17,17 +17,21 @@
   <meta http-equiv="window-target" content="_top">
   
   
-  <title>404 Not Found：该页无法显示 | 熊熊的家</title>
-  <meta property="og:type" content="website">
-<meta property="og:title" content="404 Not Found：该页无法显示">
-<meta property="og:url" content="https://aaccompany.github.io/404.html">
+  <title>并发编程的挑战（第一章） | 熊熊的家</title>
+  <meta name="description" content="并发编程的挑战1.什么是多线程？1.1.为什么要使用多线程？并发编程的好处是为了提高系统运行速度 并不是启动越多的线程系统的运行速度就能越快，因为在多线程编程中会存在各种坑。例如：死锁、线程的上下文切换、硬件、软件。 如果没有理解好这些各种各样的坑的话，那么写出来的多线程程序并不能提高系统运行速度，反而会降低系统的运行速度 1.2.什么是线程的上下文切换CPU（单核）在某个时刻只能有一个线程执行，">
+<meta name="keywords" content="多线程编程">
+<meta property="og:type" content="article">
+<meta property="og:title" content="并发编程的挑战（第一章）">
+<meta property="og:url" content="https://aaccompany.github.io/2020/01/31/并发编程的挑战/index.html">
 <meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="并发编程的挑战1.什么是多线程？1.1.为什么要使用多线程？并发编程的好处是为了提高系统运行速度 并不是启动越多的线程系统的运行速度就能越快，因为在多线程编程中会存在各种坑。例如：死锁、线程的上下文切换、硬件、软件。 如果没有理解好这些各种各样的坑的话，那么写出来的多线程程序并不能提高系统运行速度，反而会降低系统的运行速度 1.2.什么是线程的上下文切换CPU（单核）在某个时刻只能有一个线程执行，">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2019-07-08T05:37:11.090Z">
+<meta property="og:updated_time" content="2020-02-01T10:57:25.713Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="404 Not Found：该页无法显示">
+<meta name="twitter:title" content="并发编程的挑战（第一章）">
+<meta name="twitter:description" content="并发编程的挑战1.什么是多线程？1.1.为什么要使用多线程？并发编程的好处是为了提高系统运行速度 并不是启动越多的线程系统的运行速度就能越快，因为在多线程编程中会存在各种坑。例如：死锁、线程的上下文切换、硬件、软件。 如果没有理解好这些各种各样的坑的话，那么写出来的多线程程序并不能提高系统运行速度，反而会降低系统的运行速度 1.2.什么是线程的上下文切换CPU（单核）在某个时刻只能有一个线程执行，">
   <!-- Canonical links -->
-  <link rel="canonical" href="https://aaccompany.github.io/404.html">
+  <link rel="canonical" href="https://aaccompany.github.io/2020/01/31/并发编程的挑战/index.html">
   
     <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
   
@@ -36,6 +40,8 @@
   
   <link rel="stylesheet" href="/css/style.css">
   
+  
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitment@0.0.3/style/default.min.css">
   
   
   
@@ -314,14 +320,14 @@
   
 <main class="main" role="main">
   <div class="content">
-  <article id="page-" class="article article-type-page" itemscope itemtype="http://schema.org/BlogPosting">
+  <article id="post-并发编程的挑战" class="article article-type-post" itemscope itemtype="http://schema.org/BlogPosting">
     
     <div class="article-header">
       
         
   
     <h1 class="article-title" itemprop="name">
-      404 Not Found：该页无法显示
+      并发编程的挑战（第一章）
     </h1>
   
 
@@ -329,12 +335,22 @@
       <div class="article-meta">
         <span class="article-date">
     <i class="icon icon-calendar-check"></i>
-	<a href="/404.html" class="article-date">
-	  <time datetime="2019-07-08T05:37:11.090Z" itemprop="datePublished">2019-07-08</time>
+	<a href="/2020/01/31/并发编程的挑战/" class="article-date">
+	  <time datetime="2020-01-30T16:00:00.000Z" itemprop="datePublished">2020-01-31</time>
 	</a>
 </span>
         
+  <span class="article-category">
+    <i class="icon icon-folder"></i>
+    <a class="article-category-link" href="/categories/多线程编程系列/">多线程编程系列</a>
+  </span>
+
         
+  <span class="article-tag">
+    <i class="icon icon-tags"></i>
+	<a class="article-tag-link" href="/tags/多线程编程/">多线程编程</a>
+  </span>
+
 
         
 	<span class="article-read hidden-xs">
@@ -345,20 +361,73 @@
 	</span>
 
 
-        <span class="post-comment"><i class="icon icon-comment"></i> <a href="/404.html#comments" class="article-comment-link">评论</a></span>
+        <span class="post-comment"><i class="icon icon-comment"></i> <a href="/2020/01/31/并发编程的挑战/#comments" class="article-comment-link">评论</a></span>
         
 	
-		<span class="post-wordcount hidden-xs" itemprop="wordCount">字数统计: 0(字)</span>
+		<span class="post-wordcount hidden-xs" itemprop="wordCount">字数统计: 1.6k(字)</span>
 	
 	
-		<span class="post-readcount hidden-xs" itemprop="timeRequired">阅读时长: 1(分)</span>
+		<span class="post-readcount hidden-xs" itemprop="timeRequired">阅读时长: 5(分)</span>
 	
 
       </div>
     </div>
     <div class="article-entry marked-body" itemprop="articleBody">
       
-        <script type="text/javascript" src="//www.qq.com/404/search_children.js" charset="utf-8" homepageurl="<%- config.url %>" homepagename="回到我的主页"></script>
+        <h1 id="并发编程的挑战"><a href="#并发编程的挑战" class="headerlink" title="并发编程的挑战"></a>并发编程的挑战</h1><h2 id="1-什么是多线程？"><a href="#1-什么是多线程？" class="headerlink" title="1.什么是多线程？"></a>1.什么是多线程？</h2><h3 id="1-1-为什么要使用多线程？"><a href="#1-1-为什么要使用多线程？" class="headerlink" title="1.1.为什么要使用多线程？"></a>1.1.为什么要使用多线程？</h3><p><strong>并发编程的好处是为了提高系统运行速度</strong></p>
+<p>并不是启动越多的线程系统的运行速度就能越快，因为在多线程编程中会存在各种坑。例如：死锁、线程的上下文切换、硬件、软件。</p>
+<p>如果没有理解好这些各种各样的坑的话，那么写出来的多线程程序并不能提高系统运行速度，反而会降低系统的运行速度</p>
+<h3 id="1-2-什么是线程的上下文切换"><a href="#1-2-什么是线程的上下文切换" class="headerlink" title="1.2.什么是线程的上下文切换"></a>1.2.什么是线程的上下文切换</h3><p>CPU（单核）在某个时刻只能有一个线程执行，那系统中存在那么多的线程该如何执行呢？</p>
+<p>CPU通过给每个线程分配时间片来实现多线程的执行。（时间片：CPU将时间划分为一个个小的时间段，每个时间段处理一个线程）在一个时间片之后如果该线程没有执行完毕，那么就会保存该线程当前状态，并且加入下个待执行线程的状态，执行</p>
+<p>CPU保存当前线程状态–&gt;加载下一个线程状态  ：这个过程为线程的上下文切换</p>
+<p><strong>CPU线程的上下文切换会导致系统的运行速度低下</strong></p>
+<h3 id="1-3-如何查看上下文切换次数和时长"><a href="#1-3-如何查看上下文切换次数和时长" class="headerlink" title="1.3.如何查看上下文切换次数和时长"></a>1.3.如何查看上下文切换次数和时长</h3><ul>
+<li><code>Lmbench3</code>可以测量上下文切换的时长</li>
+<li>Linux命令<code>vmstat</code>可以测量上下文切换次数</li>
+</ul>
+<h3 id="1-4-如何减少线程上下文切换"><a href="#1-4-如何减少线程上下文切换" class="headerlink" title="1.4.如何减少线程上下文切换"></a>1.4.如何减少线程上下文切换</h3><p>减少上下文切换的方法有无锁编程、<code>CAS</code>算法、使用最少线程和使用协程</p>
+<ul>
+<li>无锁并发编程：多线程竞争锁的时候，会引发频繁的上下文切换，所以在多线程处理数据的时，可以采用一些方法避免使用锁，例如将数据的ID进行Hash算法取模分段，不同的线程处理不同数据段</li>
+<li><code>CAS</code>算法：Java的<code>Atomic</code>包下有许多类可以保证对单个变量的修改具有原子性，同时不会存在线程上下文切换，因为使用了自旋的模式来完成修改</li>
+<li>使用最少线程：避免创建不需要的线程，比如系统任务量很少，但是线程数很多，导致会出现无用的线程上下文切换，所以在使用线程池的时候，并不是说将线程数设置越大越好，而是需要按需设置</li>
+<li>协程：进程-&gt;线程-&gt;协程（上下级关系都为一对多），协程目前的多线程模型的最小单位，协程不由操作系统系统，而是由程序控制，减少了线程的上下文切换，因为根本不存在多线程。</li>
+</ul>
+<h2 id="2-锁"><a href="#2-锁" class="headerlink" title="2.锁"></a>2.锁</h2><h3 id="2-1-什么是锁？"><a href="#2-1-什么是锁？" class="headerlink" title="2.1.什么是锁？"></a>2.1.什么是锁？</h3><p>旅游的时候会出现一个现象，许许多多的人在厕所门口排队上厕所，而上厕所的步骤就是等待上个人<strong>开门</strong>出来-&gt;下个人进入<strong>锁门</strong></p>
+<p>每个不同的人可以理解为不同的线程</p>
+<p>厕所坑可以理解为临界资源</p>
+<p>厕所坑一次只能有一个人蹲，所以人在上厕所的可以将门锁起来，让别人不能进来一起蹲</p>
+<p>所以锁的作用可以理解为让满足条件的线程对临界资源访问</p>
+<p>但是并不是说锁只能由一个线程持有，在读写锁<code>ReentrantReadWriteLock</code>，读锁和写锁互斥，读锁和读锁是共享。也就是说读锁和写锁在一个时刻中只用有一个持有锁，但是读锁和读锁能够同时持有锁</p>
+<h3 id="2-2-死锁"><a href="#2-2-死锁" class="headerlink" title="2.2.死锁"></a>2.2.死锁</h3><ul>
+<li><p>一个线程一直持有锁并且不释放锁，导致后面的线程无法执行</p>
+</li>
+<li><p>多个线程对多个资源获取顺序不一致导致相互等待对方释放资源，陷入死锁。例如 </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">线程： t1 				t2</span><br><span class="line">资源： A				B</span><br><span class="line">资源： B   			A</span><br><span class="line">这就会出现</span><br><span class="line">t1在等待B资源，但是B资源被t2持有</span><br><span class="line">t2在等待A资源，但是A资源被t1持有</span><br><span class="line">t1 t2 陷入相互等待的状态，这种状态也就是死锁</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h4 id="2-2-1-如何避免死锁"><a href="#2-2-1-如何避免死锁" class="headerlink" title="2.2.1.如何避免死锁"></a>2.2.1.如何避免死锁</h4><ul>
+<li>避免一个线程持有多个锁</li>
+<li>一定要在<code>finally</code>代码块中释放锁</li>
+<li>避免在一段代码中使用多个锁，尽量做到一个代码块占用一个锁</li>
+<li>尝试使用定时锁，避免重复等待锁资源<code>lock.tryLock(timeout)</code></li>
+<li>对于数据库锁，加锁和解锁必须在同一个<code>Connection</code>中，否则会失效、并且会因为无法释放锁导致出现死锁</li>
+</ul>
+<h2 id="3-多线程编程与资源限制"><a href="#3-多线程编程与资源限制" class="headerlink" title="3.多线程编程与资源限制"></a>3.多线程编程与资源限制</h2><h3 id="3-1-什么是资源限制"><a href="#3-1-什么是资源限制" class="headerlink" title="3.1.什么是资源限制"></a>3.1.什么是资源限制</h3><p>多线程程序的运行速度并不是线程数多变快，而会受制于计算机的<strong>硬件资源和软件资源</strong></p>
+<p>例如：服务器下载速度<code>2M/S</code>，客户端单线程下载某资源的速度是<code>1M/S</code>，这时候并不会因为开启10个线程而让客户端的下载速度达到<code>10M/S</code>（因为服务器最大下载速度是<code>2M/S</code>，所以客户端最大只能开启两个线程让下载速度到达<code>2M/S</code>)</p>
+<p>所以在多线程编程中需要考虑资源限制这个问题。</p>
+<ul>
+<li>硬件资源：网络带宽、硬盘读写速度、CPU的处理速度</li>
+<li>软件资源：数据库的最大连接数、socket的连接数</li>
+</ul>
+<h3 id="3-2-资源限制引发的问题"><a href="#3-2-资源限制引发的问题" class="headerlink" title="3.2.资源限制引发的问题"></a>3.2.资源限制引发的问题</h3><p>客户端如果是单核CPU，强行将代码由串行修改为并行，那么会因为客户端的单核CPU导致预计中的并行执行仍然在串行执行，这样会造成多余的线程上下文切换时间消耗。</p>
+<p>所以多线程编程中需要考虑资源限制引发的问题（并未提高效率，反倒于效率下降）</p>
+<h3 id="3-3-如何解决资源限制的问题"><a href="#3-3-如何解决资源限制的问题" class="headerlink" title="3.3.如何解决资源限制的问题"></a>3.3.如何解决资源限制的问题</h3><p>解决资源限制的方法，就要从为什么会出现资源限制中解决。</p>
+<p>发生资源限制是因为 <strong>硬件限制、软件限制</strong> 那么解决这两个限制，就可从根本上解决问题</p>
+<ul>
+<li>解决硬件限制：单机处理速度跟不上，可以追加服务器数量，让运算在多机器上并发的执行</li>
+<li>解决软件限制：合理提高连接池数量、socket连接数量、代码质量</li>
+</ul>
 
       
     </div>
@@ -368,7 +437,7 @@
     
     <li class="post-copyright-link hidden-xs">
       <strong>本文链接：</strong>
-      <a href="https://aaccompany.github.io//404.html" title="404 Not Found：该页无法显示" target="_blank" rel="external">https://aaccompany.github.io//404.html</a>
+      <a href="https://aaccompany.github.io/2020/01/31/并发编程的挑战/" title="并发编程的挑战（第一章）" target="_blank" rel="external">https://aaccompany.github.io/2020/01/31/并发编程的挑战/</a>
     </li>
     
     <li class="post-copyright-license">
@@ -399,12 +468,28 @@
   </article>
   
     
+  <section id="comments">
+  	
+
+    
+  </section>
+
 
   
 </div>
 
   <nav class="bar bar-footer clearfix" data-stick-bottom>
   <div class="bar-inner">
+  
+  <ul class="pager pull-left">
+    
+    
+    <li class="next">
+      <a href="/2019/07/14/重走框架系列说明/" title="重走框架系列说明"><span>下一篇&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
+    </li>
+    
+    
+  </ul>
   
   
   <!-- Button trigger modal -->
@@ -518,6 +603,34 @@ window.jQuery || document.write('<script src="js/jquery.min.js"><\/script>')
 })(jQuery);
 </script>
 
+
+
+
+   
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+   
+    
+<script src="//cdn.jsdelivr.net/npm/gitment@0.0.3/dist/gitment.browser.min.js"></script>
+<script>
+var gitment = new Gitment({
+  // id默认为当前页面url，如果url后带参数或锚点，gitment要重新初始化
+  // https://github.com/imsun/gitment/issues/55
+  // 解决方案：id:window.location.pathname,或者将id设置为当前页面标题
+  id: '并发编程的挑战（第一章）', 
+  owner: 'Aaccompany', // 可以是你的GitHub用户名，也可以是github id
+  repo: 'git@github.com:Aaccompany/Aaccompany.github.io.git',
+  oauth: {
+    client_id: '96da4c9e4c6434dd4399',
+    client_secret: '4edee086fa4203e9f67a9d19155c9ec5d803ca88',
+  }
+})
+gitment.render('comments')
+</script>
 
 
 
