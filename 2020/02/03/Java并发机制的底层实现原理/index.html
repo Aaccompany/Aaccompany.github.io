@@ -31,7 +31,7 @@
 <meta property="og:image" content="https://aaccompany.github.io/2020/02/03/Java并发机制的底层实现原理/4.jpg">
 <meta property="og:image" content="https://aaccompany.github.io/2020/02/03/Java并发机制的底层实现原理/3.jpg">
 <meta property="og:image" content="https://aaccompany.github.io/2020/02/03/Java并发机制的底层实现原理/5.jpg">
-<meta property="og:updated_time" content="2020-02-03T17:19:05.644Z">
+<meta property="og:updated_time" content="2020-02-04T07:29:27.762Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Java并发机制的底层实现原理（第二章）">
 <meta name="twitter:description" content="Java并发机制的底层实现原理1.  Java运行过程 Java中所使用的并发机制依赖于JVM的实现和CPU指令，所以需要研究的地方便为这两处 2.多线程重要概念2.1.现代CPU模型一个CPU中会存在多核心，每个核心都会有多个缓存，这么做解决了CPU和主存速度不匹配的问题 CPU在运算的时候会先从高速缓存1-&amp;gt;高速缓存2-&amp;gt;…-&amp;gt;主存获取数据，如果有一处命中则不会继续向下获取数">
@@ -370,10 +370,10 @@
         <span class="post-comment"><i class="icon icon-comment"></i> <a href="/2020/02/03/Java并发机制的底层实现原理/#comments" class="article-comment-link">评论</a></span>
         
 	
-		<span class="post-wordcount hidden-xs" itemprop="wordCount">字数统计: 4.8k(字)</span>
+		<span class="post-wordcount hidden-xs" itemprop="wordCount">字数统计: 6.1k(字)</span>
 	
 	
-		<span class="post-readcount hidden-xs" itemprop="timeRequired">阅读时长: 17(分)</span>
+		<span class="post-readcount hidden-xs" itemprop="timeRequired">阅读时长: 22(分)</span>
 	
 
       </div>
@@ -430,6 +430,21 @@
 <td align="center">写缺失</td>
 <td align="center">write misses the cache</td>
 <td align="left">一个有效的缓存行被写入到了不存在的内存区域</td>
+</tr>
+<tr>
+<td align="center">比较并交换</td>
+<td align="center">compare and swap</td>
+<td align="left">CAS操作需要输入两个数值，一个是旧值（期望操作前的值）和一个新值<br>在操作期间先比较旧值有没有发生变化，如果没有发生变化则更新成功或者失败</td>
+</tr>
+<tr>
+<td align="center">CPU流水线</td>
+<td align="center">CPU pipeline</td>
+<td align="left">指令的执行，需要取址、执行、IO等，这三个操作分别在不同CPU内部结构中执行<br>但是为了提高CPU的吞吐量，会将这些操作异步执行</td>
+</tr>
+<tr>
+<td align="center">内存顺序冲突</td>
+<td align="center">Memory order violation</td>
+<td align="left">内存顺序冲突一般是由假共享起因的，假共享是指多个CPU同一时刻修改同一个缓存的不同部分<br>当出现了这个冲突的时候CPU必须清空CPU流水线</td>
 </tr>
 </tbody></table>
 <h2 id="3-Volatile"><a href="#3-Volatile" class="headerlink" title="3. Volatile"></a>3. Volatile</h2><p>多线程编程中Volatile和Synchronized都是常见修饰符</p>
@@ -572,7 +587,7 @@
 </tr>
 </tbody></table>
 <p>这个时候观察表格可以发现，为什么需要1 bit来描述是否为偏向锁，因为对象头的状态有5种，但是锁标记位只有2 bit导致不够描述，所以添加多一个bit作为说明</p>
-<h3 id="4-6-锁的升级与对比"><a href="#4-6-锁的升级与对比" class="headerlink" title="4.6.锁的升级与对比"></a>4.6.锁的升级与对比</h3><p>锁会锁着锁的竞争激烈程度进行升级，但是不能降级，这样做的目的时位了提高获取锁和释放锁的效率</p>
+<h3 id="4-6-锁的升级与对比"><a href="#4-6-锁的升级与对比" class="headerlink" title="4.6.锁的升级与对比"></a>4.6.锁的升级与对比</h3><p>锁会锁着锁的竞争激烈程度进行升级，但是不能降级，这样做的目的是为了提高获取锁和释放锁的效率</p>
 <h4 id="4-6-1-偏向锁"><a href="#4-6-1-偏向锁" class="headerlink" title="4.6.1.偏向锁"></a>4.6.1.偏向锁</h4><p>偏向锁顾名思义，偏向锁会偏向一个线程。</p>
 <p>在大多数情况下，锁不仅不存在多线程竞争，而且总是同一个线程进入同步代码块，如果不断的进行获取锁释放锁效率将降低很多</p>
 <p>所以偏向锁会记录第一次获取锁的线程ID，并且在这个线程再次进入的时候，直接放行，加快了进入同步代码块的速度</p>
@@ -600,7 +615,7 @@
 <li>如果成功则说明释放锁成功</li>
 <li>失败则说明发生锁竞争，升级为重量级锁</li>
 </ul>
-<h5 id="4-6-2-3-轻量级锁膨胀锁流程图"><a href="#4-6-2-3-轻量级锁膨胀锁流程图" class="headerlink" title="4.6.2.3.轻量级锁膨胀锁流程图"></a>4.6.2.3.轻量级锁膨胀锁流程图</h5><p>因为自旋会消耗CPU的运算资源，为了避免无用的自旋，一旦升级为重量级锁，则不会降级了。当锁处于这个重量级锁的状态，其他线程试图获取锁时都会阻塞，当持有锁的线程释放锁之后会唤醒所有被阻塞的线程，接下来则会进行锁竞争的过程。</p>
+<h5 id="4-6-2-3-轻量级锁膨胀流程图"><a href="#4-6-2-3-轻量级锁膨胀流程图" class="headerlink" title="4.6.2.3.轻量级锁膨胀流程图"></a>4.6.2.3.轻量级锁膨胀流程图</h5><p>因为自旋会消耗CPU的运算资源，为了避免无用的自旋，一旦升级为重量级锁，则不会降级了。当锁处于这个重量级锁的状态，其他线程试图获取锁时都会阻塞，当持有锁的线程释放锁之后会唤醒所有被阻塞的线程，接下来则会进行锁竞争的过程。</p>
 <p><img src="/2020/02/03/Java并发机制的底层实现原理/5.jpg" alt></p>
 <h4 id="4-6-3-不同锁的对比"><a href="#4-6-3-不同锁的对比" class="headerlink" title="4.6.3.不同锁的对比"></a>4.6.3.不同锁的对比</h4><table>
 <thead>
@@ -630,7 +645,58 @@
 <td>执行速度最慢，因为相比于轻量级锁<br>多了很多线程上下文切换的时间<br>适用于锁竞争激烈的场景</td>
 </tr>
 </tbody></table>
-<h2 id="5-原子操作的实现原理"><a href="#5-原子操作的实现原理" class="headerlink" title="5.原子操作的实现原理"></a>5.原子操作的实现原理</h2>
+<h2 id="5-原子操作的实现原理"><a href="#5-原子操作的实现原理" class="headerlink" title="5.原子操作的实现原理"></a>5.原子操作的实现原理</h2><p>原子（atomic）本意是“不可进一步分割的最小粒子”，而原子操作（atomic operation)意为“不可以被中断的一个或一系列的操作”</p>
+<h3 id="5-1-处理器如何实现原子操作"><a href="#5-1-处理器如何实现原子操作" class="headerlink" title="5.1.处理器如何实现原子操作"></a>5.1.处理器如何实现原子操作</h3><ul>
+<li>解决方案有两种：<ul>
+<li>总线加锁：对总线加锁，在写的过程中，其他CPU都无法访问主存</li>
+<li>缓存加锁：对缓存行加锁，在写的过程中会锁住该缓存行，在其他CPU中该缓存行失效，重新从主存获取</li>
+</ul>
+</li>
+<li>处理器会自动保证基本的内存操作的原子性</li>
+<li><strong>两种情况下处理器不会适用缓存行锁定</strong><ul>
+<li>数据跨多个缓存行，CPU会采用锁总线操作；数据不能被加载进高速缓存</li>
+<li>处理器不支持锁缓存行</li>
+</ul>
+</li>
+</ul>
+<h3 id="5-2-Java如何实现原子操作"><a href="#5-2-Java如何实现原子操作" class="headerlink" title="5.2.Java如何实现原子操作"></a>5.2.Java如何实现原子操作</h3><p>Java中很多操作都非原子操作，例如最常见的<code>i++</code>就是一个非原子的操作</p>
+<p>Java中可以采用<code>CAS</code>和加锁操作来完成原子操作</p>
+<h4 id="5-2-1-使用循环CAS实现原子操作"><a href="#5-2-1-使用循环CAS实现原子操作" class="headerlink" title="5.2.1.使用循环CAS实现原子操作"></a>5.2.1.使用循环CAS实现原子操作</h4><p>JVM中的CAS操作是底层使用了处理器提供的CMPXCHG指令实现。</p>
+<p>自旋CAS实现的基本思路循环CAS操作直到完成为止</p>
+<blockquote>
+<p>从JDK1.5开始，Java提供的并发包提供了一些类来支撑某些原子操作，如AtomicBoolean(用原子方式更新Boolean)，AtomicInteger（用原子操作更新int值）等等</p>
+</blockquote>
+<p>下面操作即为实现CAS线程安全的计数器方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Counter</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> AtomicInteger atomicI = <span class="keyword">new</span> AtomicInteger(<span class="number">0</span>);</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> i  = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">        <span class="keyword">final</span> Counter counter = <span class="keyword">new</span> Counter();</span><br><span class="line">        List&lt;Thread&gt; threadList = <span class="keyword">new</span> ArrayList&lt;&gt;(<span class="number">100</span>);</span><br><span class="line">        <span class="keyword">long</span> start = System.currentTimeMillis();</span><br><span class="line">        <span class="comment">//创建100个线程 每个线程任务为计数自增1000次</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">100</span>; i++) &#123;</span><br><span class="line">            Thread t = <span class="keyword">new</span> Thread(<span class="keyword">new</span> Runnable() &#123;</span><br><span class="line">                <span class="meta">@Override</span></span><br><span class="line">                <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">                    <span class="keyword">for</span> (<span class="keyword">int</span> i1 = <span class="number">0</span>; i1 &lt; <span class="number">1000</span>; i1++) &#123;</span><br><span class="line">                        counter.safeCount();</span><br><span class="line">                        counter.count();</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;);</span><br><span class="line">            threadList.add(t);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">//开启100个线程</span></span><br><span class="line">        <span class="keyword">for</span> (Thread thread : threadList) &#123;</span><br><span class="line">            thread.start();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">//main线程等待100个线程执行完毕</span></span><br><span class="line">        <span class="keyword">for</span> (Thread thread : threadList) &#123;</span><br><span class="line">            thread.join();</span><br><span class="line">        &#125;</span><br><span class="line">        System.out.println(<span class="string">"线程安全计数器:"</span>+counter.atomicI.get());</span><br><span class="line">        System.out.println(<span class="string">"非线程安全计数器:"</span>+counter.i);</span><br><span class="line">        System.out.println(<span class="string">"执行耗时:"</span>+(System.currentTimeMillis()-start));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 使用CAS的线程安全计数器</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">safeCount</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="comment">//自旋CAS操作，减少线程上下文切换</span></span><br><span class="line">        <span class="keyword">for</span> (;;)&#123;</span><br><span class="line">            <span class="comment">//获取最新值</span></span><br><span class="line">            <span class="keyword">int</span> i = atomicI.get();</span><br><span class="line">            <span class="comment">//使用CAS替换值，如果生成则退出</span></span><br><span class="line">            <span class="keyword">boolean</span> suc = atomicI.compareAndSet(i, i + <span class="number">1</span>);</span><br><span class="line">            <span class="keyword">if</span> (suc)&#123;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 非线程安全计数器</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">count</span><span class="params">()</span></span>&#123;</span><br><span class="line">        i++;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="5-2-2-使用CAS实现原子操作的三大问题"><a href="#5-2-2-使用CAS实现原子操作的三大问题" class="headerlink" title="5.2.2.使用CAS实现原子操作的三大问题"></a>5.2.2.使用CAS实现原子操作的三大问题</h4><ul>
+<li>ABA问题<ul>
+<li>在CAS的原理上，是检查旧值和内存中的值是否一样，如果一样就替换为新值。这就会出现一个BUG，如果在更新的过程中有人修改了值，最后又变成了旧值，那么它在检查的时候CAS会发现值未发现改变，然后替换。</li>
+<li>这个概念可能会很抽象，并且不好理解有啥危害。个人理解，简单的说就是狸猫换太子</li>
+<li>举个例子：<ul>
+<li>小A有一个满的水，小A离开了房间</li>
+<li>小B看到房间有杯水，喝完了然后倒回去</li>
+<li>小A回来看到水还是水，然后继续喝了</li>
+</ul>
+</li>
+<li>解决方案：<ul>
+<li>每次修改都添加版本号，就像1A-&gt;2B-&gt;3A，这样就能够避免出现ABA的问题</li>
+<li>在Java中提供了AtomicStampedReference类来实现</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>循环时间长开销大<ul>
+<li>通过<code>5.2.1</code>的代码可以发现有个<code>for(;;)</code>操作，不断的循环，做无用的运算</li>
+</ul>
+</li>
+<li>只能保证一个变量进行原子操作<ul>
+<li>如果有多个变量需要进行CAS原子操作，可以将多个变量合成一个Java对象，Java提供了AtomicReference来实现对象的原子操作</li>
+</ul>
+</li>
+</ul>
+<h3 id="5-3-Java使用锁机制来完成原子操作"><a href="#5-3-Java使用锁机制来完成原子操作" class="headerlink" title="5.3.Java使用锁机制来完成原子操作"></a>5.3.Java使用锁机制来完成原子操作</h3><p>锁机制保证了只有获取锁的线程才能进入同步代码块。JVM内部实现了很多锁机制，有偏向锁、轻量级锁、重量级锁（互斥锁），JVM中锁机制都是通过CAS来完成获取锁和释放锁</p>
+
       
     </div>
     <div class="article-footer">
