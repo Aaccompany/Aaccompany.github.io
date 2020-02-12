@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="utf-8">
+  
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="format-detection" content="telephone=no,email=no,adress=no">
+  <!-- Color theme for statusbar -->
+  <meta name="theme-color" content="#000000">
+  <!-- 强制页面在当前窗口以独立页面显示,防止别人在框架里调用页面 -->
+  <meta http-equiv="window-target" content="_top">
+  
+  
+  <title>Java并发容器和框架（第六章） | 熊熊的家</title>
+  <meta name="description" content="Java并发容器和框架1.ConcurrentHashMap的实现原理与使用ConcurrentHashMap是线程安全集合类，那么它是如何实现的呢？ 1.1.为什么要使用ConcurrentHashMap? 线程不安全的HashMap 多线程环境下使用HashMap，在JDK7HashMap扩容（resize）因为采用链表头插导致链表成环，遍历链表的时候就会出现死循环，导致CPU到达100%。在">
+<meta name="keywords" content="多线程编程">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java并发容器和框架（第六章）">
+<meta property="og:url" content="https://aaccompany.github.io/2020/02/03/Java并发容器和框架/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="Java并发容器和框架1.ConcurrentHashMap的实现原理与使用ConcurrentHashMap是线程安全集合类，那么它是如何实现的呢？ 1.1.为什么要使用ConcurrentHashMap? 线程不安全的HashMap 多线程环境下使用HashMap，在JDK7HashMap扩容（resize）因为采用链表头插导致链表成环，遍历链表的时候就会出现死循环，导致CPU到达100%。在">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://aaccompany.github.io/2020/02/03/Java并发容器和框架/1.jpg">
+<meta property="og:image" content="https://aaccompany.github.io/2020/02/03/Java并发容器和框架/2.jpg">
+<meta property="og:updated_time" content="2020-02-08T15:59:19.062Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Java并发容器和框架（第六章）">
+<meta name="twitter:description" content="Java并发容器和框架1.ConcurrentHashMap的实现原理与使用ConcurrentHashMap是线程安全集合类，那么它是如何实现的呢？ 1.1.为什么要使用ConcurrentHashMap? 线程不安全的HashMap 多线程环境下使用HashMap，在JDK7HashMap扩容（resize）因为采用链表头插导致链表成环，遍历链表的时候就会出现死循环，导致CPU到达100%。在">
+<meta name="twitter:image" content="https://aaccompany.github.io/2020/02/03/Java并发容器和框架/1.jpg">
+  <!-- Canonical links -->
+  <link rel="canonical" href="https://aaccompany.github.io/2020/02/03/Java并发容器和框架/index.html">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png" type="image/x-icon">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+  
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitment@0.0.3/style/default.min.css">
+  
+  
+  
+</head>
+
+
+<body class="main-center theme-black" itemscope itemtype="http://schema.org/WebPage">
+  <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+  <div class="slimContent">
+    <div class="navbar-header">
+      
+      
+      <div class="profile-block text-center">
+        <a id="avatar" href="https://github.com/Aaccompany" target="_blank">
+          <img class="img-circle img-rotate" src="/images/avatar.jpg" width="200" height="200">
+        </a>
+        <h2 id="name" class="hidden-xs hidden-sm">Accompany</h2>
+        <h3 id="title" class="hidden-xs hidden-sm hidden-md">Java Developer &amp; Accompany my lover</h3>
+        <small id="location" class="text-muted hidden-xs hidden-sm"><i class="icon icon-map-marker"></i> Shenzhen, China</small>
+      </div>
+      
+      <div class="search" id="search-form-wrap">
+
+    <form class="search-form sidebar-form">
+        <div class="input-group">
+            <input type="text" class="search-form-input form-control" placeholder="搜索" />
+            <span class="input-group-btn">
+                <button type="submit" class="search-form-submit btn btn-flat" onclick="return false;"><i class="icon icon-search"></i></button>
+            </span>
+        </div>
+    </form>
+    <div class="ins-search">
+  <div class="ins-search-mask"></div>
+  <div class="ins-search-container">
+    <div class="ins-input-wrapper">
+      <input type="text" class="ins-search-input" placeholder="想要查找什么..." x-webkit-speech />
+      <button type="button" class="close ins-close ins-selectable" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+    </div>
+    <div class="ins-section-wrapper">
+      <div class="ins-section-container"></div>
+    </div>
+  </div>
+</div>
+
+
+</div>
+      <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#main-navbar" aria-controls="main-navbar" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <nav id="main-navbar" class="collapse navbar-collapse" itemscope itemtype="http://schema.org/SiteNavigationElement" role="navigation">
+      <ul class="nav navbar-nav main-nav ">
+        
+        
+        <li class="menu-item menu-item-home">
+          <a href="/.">
+            
+            <i class="icon icon-home-fill"></i>
+            
+            <span class="menu-title">首页</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives">
+            
+            <i class="icon icon-archives-fill"></i>
+            
+            <span class="menu-title">归档</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories">
+            
+            <i class="icon icon-folder"></i>
+            
+            <span class="menu-title">分类</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags">
+            
+            <i class="icon icon-tags"></i>
+            
+            <span class="menu-title">标签</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-repository">
+          <a href="/repository">
+            
+            <i class="icon icon-project"></i>
+            
+            <span class="menu-title">项目</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about">
+            
+            <i class="icon icon-cup-fill"></i>
+            
+            <span class="menu-title">关于</span>
+          </a>
+        </li>
+        
+      </ul>
+      
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/Aaccompany" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li>
+        
+    </ul>
+
+    </nav>
+  </div>
+</header>
+
+  
+    <aside class="sidebar" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    
+      <div class="widget">
+    <h3 class="widget-title">公告</h3>
+    <div class="widget-body">
+        <div id="board">
+            <div class="content">
+                <p>君子生非异也，善假于物也。<br> 故不积跬步，无以至千里；不积小流，无以成江海。 </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget-body">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Java集合类/">Java集合类</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/MQ/">MQ</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/后端框架/">后端框架</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/多线程编程系列/">多线程编程系列</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/杂谈/">杂谈</a><span class="category-list-count">1</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget-body">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Map集合/">Map集合</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/多线程编程/">多线程编程</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/杂谈/">杂谈</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/消息中间件/">消息中间件</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/重走系列/">重走系列</a><span class="tag-list-count">2</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget-body tagcloud">
+      <a href="/tags/Map集合/" style="font-size: 13px;">Map集合</a> <a href="/tags/spring/" style="font-size: 13.33px;">spring</a> <a href="/tags/多线程编程/" style="font-size: 14px;">多线程编程</a> <a href="/tags/杂谈/" style="font-size: 13px;">杂谈</a> <a href="/tags/消息中间件/" style="font-size: 13.67px;">消息中间件</a> <a href="/tags/重走系列/" style="font-size: 13.33px;">重走系列</a>
+    </div>
+  </div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget-body">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/02/">二月 2020</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/01/">一月 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/07/">七月 2019</a><span class="archive-list-count">6</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget-body">
+      <ul class="recent-post-list list-unstyled no-thumbnail">
+        
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/多线程编程系列/">多线程编程系列</a>
+              </p>
+              <p class="item-title">
+                <a href="/2020/02/12/Java中的线程池/" class="title">Java中的线程池（第九章）</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2020-02-11T16:00:00.000Z" itemprop="datePublished">2020-02-12</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/Java集合类/">Java集合类</a>
+              </p>
+              <p class="item-title">
+                <a href="/2020/02/05/HashMap解析/" class="title">HashMap 解析</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2020-02-04T16:00:00.000Z" itemprop="datePublished">2020-02-05</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/多线程编程系列/">多线程编程系列</a>
+              </p>
+              <p class="item-title">
+                <a href="/2020/02/03/Java并发容器和框架/" class="title">Java并发容器和框架（第六章）</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2020-02-02T16:00:00.000Z" itemprop="datePublished">2020-02-03</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/多线程编程系列/">多线程编程系列</a>
+              </p>
+              <p class="item-title">
+                <a href="/2020/02/03/Java并发机制的底层实现原理/" class="title">Java并发机制的底层实现原理（第二章）</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2020-02-02T16:00:00.000Z" itemprop="datePublished">2020-02-03</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/多线程编程系列/">多线程编程系列</a>
+              </p>
+              <p class="item-title">
+                <a href="/2020/01/31/并发编程的挑战/" class="title">并发编程的挑战（第一章）</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2020-01-30T16:00:00.000Z" itemprop="datePublished">2020-01-31</time>
+              </p>
+            </div>
+          </li>
+          
+      </ul>
+    </div>
+  </div>
+  
+
+    
+  </div>
+</aside>
+
+  
+  
+<main class="main" role="main">
+  <div class="content">
+  <article id="post-Java并发容器和框架" class="article article-type-post" itemscope itemtype="http://schema.org/BlogPosting">
+    
+    <div class="article-header">
+      
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Java并发容器和框架（第六章）
+    </h1>
+  
+
+      
+      <div class="article-meta">
+        <span class="article-date">
+    <i class="icon icon-calendar-check"></i>
+	<a href="/2020/02/03/Java并发容器和框架/" class="article-date">
+	  <time datetime="2020-02-02T16:00:00.000Z" itemprop="datePublished">2020-02-03</time>
+	</a>
+</span>
+        
+  <span class="article-category">
+    <i class="icon icon-folder"></i>
+    <a class="article-category-link" href="/categories/多线程编程系列/">多线程编程系列</a>
+  </span>
+
+        
+  <span class="article-tag">
+    <i class="icon icon-tags"></i>
+	<a class="article-tag-link" href="/tags/多线程编程/">多线程编程</a>
+  </span>
+
+
+        
+	<span class="article-read hidden-xs">
+	    <i class="icon icon-eye-fill" aria-hidden="true"></i>
+	    <span id="busuanzi_container_page_pv">
+			<span id="busuanzi_value_page_pv">0</span>
+		</span>
+	</span>
+
+
+        <span class="post-comment"><i class="icon icon-comment"></i> <a href="/2020/02/03/Java并发容器和框架/#comments" class="article-comment-link">评论</a></span>
+        
+	
+		<span class="post-wordcount hidden-xs" itemprop="wordCount">字数统计: 2.6k(字)</span>
+	
+	
+		<span class="post-readcount hidden-xs" itemprop="timeRequired">阅读时长: 9(分)</span>
+	
+
+      </div>
+    </div>
+    <div class="article-entry marked-body" itemprop="articleBody">
+      
+        <h1 id="Java并发容器和框架"><a href="#Java并发容器和框架" class="headerlink" title="Java并发容器和框架"></a>Java并发容器和框架</h1><h2 id="1-ConcurrentHashMap的实现原理与使用"><a href="#1-ConcurrentHashMap的实现原理与使用" class="headerlink" title="1.ConcurrentHashMap的实现原理与使用"></a>1.ConcurrentHashMap的实现原理与使用</h2><p><code>ConcurrentHashMap</code>是线程安全集合类，那么它是如何实现的呢？</p>
+<h3 id="1-1-为什么要使用ConcurrentHashMap"><a href="#1-1-为什么要使用ConcurrentHashMap" class="headerlink" title="1.1.为什么要使用ConcurrentHashMap?"></a>1.1.为什么要使用ConcurrentHashMap?</h3><ul>
+<li><p><strong>线程不安全的<code>HashMap</code></strong></p>
+<p>多线程环境下使用<code>HashMap</code>，在JDK7<strong>HashMap扩容（resize）</strong>因为采用链表头插导致链表成环，遍历链表的时候就会出现死循环，导致CPU到达100%。在JDK8在扩容时采用链表尾插，就不会存在链表成环的现象，但是在多线程环境下put方法和get方法仍然时不安全的。</p>
+</li>
+<li><p><strong>线程安全但效率低下的<code>HashTable</code></strong></p>
+<p>线程安全的实现方式是方法锁，在使用调用一个方法的时候，其他全部方法都将阻塞，所以在线程竞争激烈的场景下效率会越来越慢</p>
+</li>
+<li><p><strong>ConcurrentHashMap锁分段技术可有效提高访问率</strong></p>
+<p>HashTable因为多线程在争夺一把锁导致效率低下，而ConcurrentHashMap是为了避免多线程争夺一把锁引入了分段式锁的概念，每一把锁用于锁住容器中一部分数据，当多线程访问容器中不同数据段的时候便不会出现锁竞争现象，从而提高可以有效提高并发访问效率，这就是ConcurrentHashMap所使用的分段技术。</p>
+<p>首先将数据分成一段一段地存储，然后给每一段数据分配一把锁，当一个线程占用锁访问一段数据的时候，其他段的数据也能访问</p>
+</li>
+</ul>
+<h3 id="1-2-ConcurrentHashMap的结构"><a href="#1-2-ConcurrentHashMap的结构" class="headerlink" title="1.2.ConcurrentHashMap的结构"></a>1.2.ConcurrentHashMap的结构</h3><p>通过ConcurrentHashMap的类图来分析ConcurrentHashMap的结构</p>
+<p><img src="/2020/02/03/Java并发容器和框架/1.jpg" alt></p>
+<p><img src="/2020/02/03/Java并发容器和框架/2.jpg" alt></p>
+<h3 id="1-3-ConcurrentHashMap的初始化"><a href="#1-3-ConcurrentHashMap的初始化" class="headerlink" title="1.3.ConcurrentHashMap的初始化"></a>1.3.ConcurrentHashMap的初始化</h3><p>ConcurrentHashMap初始化方法是通过<code>initialCapacity</code>、<code>loadFactor</code>和<code>concurrencyLevel</code>等几个参数初始化<code>segment数组</code>、<code>段偏移量segmentShift</code>、<code>段掩码segmentMask</code>和<code>每个segment中的HashEntity数组</code></p>
+<h4 id="1-3-1-初始化segment数组"><a href="#1-3-1-初始化segment数组" class="headerlink" title="1.3.1.初始化segment数组"></a>1.3.1.初始化segment数组</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span>(concurrencyLevel&gt;MAX_SEGMENTS)</span><br><span class="line">    concurrentLevel = MAX_SEGMENTS;</span><br><span class="line"><span class="keyword">int</span> sshift = <span class="number">0</span>;</span><br><span class="line"><span class="keyword">int</span> sszie = <span class="number">1</span>;</span><br><span class="line"><span class="keyword">while</span>(ssize&lt;concurrencyLevel)&#123;</span><br><span class="line">    ++sshift;</span><br><span class="line">    ssize&lt;&lt;<span class="number">1</span>;</span><br><span class="line">&#125;</span><br><span class="line">segmentShift = <span class="number">32</span> - sshift;</span><br><span class="line">segmentShift = ssize -<span class="number">1</span>;</span><br><span class="line"><span class="keyword">this</span>.segments = Segment.newArray(ssize);</span><br></pre></td></tr></table></figure>
+
+<p>由上方代码可以发现，segment数组的长度是由concurrencyLevel计算得出。为了能通过<strong>按位与的散列算法</strong>来定位segment数组的索引，<strong>必须保证数组长度为2的N次方（power-of-two size)</strong>，所以必须计算出一个大于或等于concurrencyLevel的值做为数组长度。</p>
+<p>假如concurrencyLevel为14、15、16最后数组长度也会为16</p>
+<blockquote>
+<p>concurrentcyLevel的最大值为65535，说明了segment数组的长度最大值65536，对应的二进制是16位1</p>
+</blockquote>
+<h4 id="1-3-2-初始化segmentShift和segmentMask"><a href="#1-3-2-初始化segmentShift和segmentMask" class="headerlink" title="1.3.2.初始化segmentShift和segmentMask"></a>1.3.2.初始化segmentShift和segmentMask</h4><p>这两个全局变量需要在定位segment时的散列算法里使用，sshift等于ssize从1向左移动的次数，在默认情况下concurrencyLevel等于16，1需要向左移位4次，所以sshift等于4。</p>
+<p>segmentShift用于定位参与散列运算的位数，segmentShift等于32减去sshift，所以等于28，这里之所以用32是因为ConcurrentHashMap里的hash()方法输出的最大数位32的。</p>
+<p>segmentMask是散列运算的掩码，等于ssize减1，即15掩码的二进制各个位的值都是1。</p>
+<p>因为ssize的最大长度是65536，所以segmentShift最大值是16（因为最大移动次数为16次，segmentShift = 32 - ssshift），segmentMask最大值是65535，对应的二进制是16位，每位都为1。</p>
+<h4 id="1-3-3-初始化每个segment"><a href="#1-3-3-初始化每个segment" class="headerlink" title="1.3.3.初始化每个segment"></a>1.3.3.初始化每个segment</h4><p>输出参数<code>initialCapacity</code>是ConcurrentHashMap的初始容量，<code>localfactor</code>是每个segment的负载因子，在构造方法里需要通过这两个参数来初始化segment数组中的每个元素</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span>(initialCapacity&gt;MAXIMUM_CAPACITY)</span><br><span class="line">    initialCapacity = MAXIMUM_CAPACITY;</span><br><span class="line"><span class="comment">// c 的值为每个Segment中存放多少个元素</span></span><br><span class="line"><span class="keyword">int</span> c = initialCapacity / ssize;</span><br><span class="line"><span class="comment">// 避免没有整除向下取值，做加一操作</span></span><br><span class="line"><span class="keyword">if</span>(c * ssize &lt; initialCapacity)</span><br><span class="line">    ++c;</span><br><span class="line"><span class="comment">// cap为具体存放多少个元素，取等于或大于c的2的次数幂</span></span><br><span class="line"><span class="keyword">int</span> cap = <span class="number">1</span>;</span><br><span class="line"><span class="keyword">while</span>(cap &lt; c)&#123;</span><br><span class="line">    cap &lt;&lt;=<span class="number">1</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="keyword">this</span>.segments.length;i++)</span><br><span class="line">    <span class="comment">//初始化segment</span></span><br><span class="line">    <span class="keyword">this</span>.segments[i] = <span class="keyword">new</span> Segment&lt;K,V&gt;(cap,loadFactor);</span><br></pre></td></tr></table></figure>
+
+<p>上面代码中的变量cap就是segment里HashEntity数组的长度，它等于<code>initialCapacity</code>除以<code>ssize</code>的倍数c，如果c大于1，则cap就会大于等于c的2的N次方值，所以cap的值不是1就是2的N次方。segment的容量<code>threshold =(int) cap * loadFactor</code>，默认情况下initialCapacity等于16，loadFactor等于0.75，带入运算cap等于1，threshold等于0</p>
+<h4 id="1-3-4-定位Segment"><a href="#1-3-4-定位Segment" class="headerlink" title="1.3.4.定位Segment"></a>1.3.4.定位Segment</h4><p>既然ConcurrentHashMap使用分段锁Segment来保护不同段的数据，那么在插入和获取元素的时候，必须先通过散列算法定位到具体的segment。可以看到ConcurrentHashMap会首先使用<code>Wang/Jenkins hash</code>的变种算法对元素的hashCode<strong>再</strong>进行一次散列（也就是获取到key的HashCode然后再进行hash计算）</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">int</span> <span class="title">hash</span><span class="params">(<span class="keyword">int</span> h)</span></span>&#123;</span><br><span class="line">    h += (h&lt;&lt;<span class="number">15</span>) ^ <span class="number">0xffffcd7d</span>;</span><br><span class="line">    h ^= (h&gt;&gt;&gt;<span class="number">10</span>);</span><br><span class="line">    h += (h&lt;&lt;<span class="number">3</span>);</span><br><span class="line">    h ^= (h&gt;&gt;&gt;<span class="number">6</span>);</span><br><span class="line">    h += (h&lt;&lt;<span class="number">2</span>) + (h&lt;&lt;<span class="number">14</span>);</span><br><span class="line">    <span class="keyword">return</span> h^ (h&gt;&gt;&gt;<span class="number">16</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>之所以需要再散列，目的是为了减少散列冲突，使元素能够均匀地分布再不同的segment上，从而提高容器的存取效率。假如散列的质量差到极点，那么所有的元素都将在同一个segment中，不仅存取效率慢，同时会不断的扩容分布锁也将失去了意义。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">final</span> Segment&lt;K,V&gt; <span class="title">segmentFor</span><span class="params">(<span class="keyword">int</span> hash)</span></span>&#123;</span><br><span class="line">    <span class="keyword">return</span> segemnts[ (hash&gt;&gt;segmentShift) &amp; segmentMask]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>默认情况下segmentShift为28，segmentMask为15，再散列后的数最大值是32位二进制数据，向右无符号移动28位，意思是让高4位参与散列运算中<code>（hash&gt;&gt;segmentShift)&amp;segmentMask</code>的运算结果。就可以降低散列值冲突情况</p>
+<h3 id="1-4-ConcurrentHashMap的操作"><a href="#1-4-ConcurrentHashMap的操作" class="headerlink" title="1.4.ConcurrentHashMap的操作"></a>1.4.ConcurrentHashMap的操作</h3><h4 id="1-4-1-get操作"><a href="#1-4-1-get操作" class="headerlink" title="1.4.1.get操作"></a>1.4.1.get操作</h4><p>Segment的get操作实现非常简单和高效。先经过一次散列后再进行散列，然后使用这个散列值通过散列运算定位到具体的Segment，再通过散列算法定位到元素，代码如下。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> V <span class="title">get</span><span class="params">(Object key)</span></span>&#123;</span><br><span class="line">    <span class="comment">// 先获取key的hash值然后再进行散列</span></span><br><span class="line">    <span class="keyword">int</span> hash = hash(key.HashCode());</span><br><span class="line">    <span class="comment">// 先获取对应的Segment然后再获取对应的HashEntity</span></span><br><span class="line">    <span class="keyword">return</span> SegmentFor(hash).get(key,hash);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>get操作的高效之处在于整个get过程不需要加锁，除非读到的值是空才会加锁重读。</p>
+<p><strong>HashTable容器的get方法是加锁的，那么ConcurrentHashMap的get操作是如何做到不加锁的呢？</strong></p>
+<p>因为在ConcurrentHashMap中get方法所使用的共享变量都被<strong>volatile修饰</strong>，如用于统计当前Segment大小的<strong>count字段</strong>和用于<strong>存储值的HashEntity的value</strong>。这就保证了这些变量在多线程之间的可见性，能够被多线程同时读，并且保证不会读取到过期的值，但是只能被单个线程写（有一种情况可以被多线程写，就是写入的值不依赖于原值），在get操作只需要读不需要写共享变量count和value，所以可以不用加锁。之所以不会读到过期的值，是因为根据Java内存模型happen before原则，对volatile字段的写操作先于读操作，即使两个线程同时修改和获取volatile变量，get操作也能拿到最新的值。这就是用volatile替换锁的经典应用场景。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">transient</span> <span class="keyword">volatile</span> <span class="keyword">int</span> count;</span><br><span class="line"><span class="keyword">volatile</span> V value;</span><br></pre></td></tr></table></figure>
+
+<p>定位元素的代码可以发现，定位HashEntity和定位Segment的散列算法虽然医院，都在数组的长度减去1再相“与”的值不一样，定位Segment使用的是元素hashcode通过再散列后得到的值的高位，而定位HashEntity直接使用的是再散列后的值。其目的是为了避免两次散列后的值一样，虽然元素再Segment里散开了，但是却没有再HashEntity里散列开</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">hash&gt;&gt;&gt; segmentShift ) &amp; segmentMask <span class="comment">//定位Segment所使用的hash算法</span></span><br><span class="line"><span class="keyword">int</span> index = hash &amp; (tab.length - <span class="number">1</span>) <span class="comment">//定位HashEntity所使用的hash算法</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="1-4-2-put操作"><a href="#1-4-2-put操作" class="headerlink" title="1.4.2.put操作"></a>1.4.2.put操作</h4><p>由于put方法里需要对共享变量进行写入操作，所以为了线程安全，在操作共享变量时必须加锁。put方法首先定位到Segment，然后在Segment里进行操作插入操作。</p>
+<p>第一步：判断是否需要对Segment里的HashEntity数进行扩容</p>
+<ul>
+<li><p>是否需要扩容</p>
+<p>在插入元素前会先判断Segment里的HashEntity数据是否超过容量(threshold)，如果超过阈值，则对数组进行扩容。值得一提的是，Segment的扩容判断比HashMap更加合理，因为HashMap是在插入元素后判断是否到达容量的，如果到达了就进行扩容，但是很有可能扩容没有新元素插入，这时HashMap就进行了一次无用的扩容</p>
+</li>
+<li><p>如何扩容</p>
+<p>在扩容的时候，首先会创建一个容量是原来容量的两倍的数组，然后将原数组里的元素进行再散列后插入到新数组里。为了高效，ConcurrentHashMap不会对整个容器进行扩容，而是只对某个segment进行扩容</p>
+</li>
+</ul>
+<p>第二步：定位需要添加元素的位置，然后将其放在HashEntity数组里</p>
+<h4 id="1-4-3-size操作"><a href="#1-4-3-size操作" class="headerlink" title="1.4.3.size操作"></a>1.4.3.size操作</h4><p>如果要统计整个ConcurrentHashMap里元素的大小，就必须统计所有Segment元素的大小后求和。Segment里的全局变量count是一个volatile变量，那么在多线程环境下对全部Segment里的count相加是否就是ConcurrentHashMap的大小呢？</p>
+<p>然而并不是这样做就可以得到容器的大小，因为在多线程环境下，容器的大小会变化，导致了计算不精准。但是如果对全部Segment进行加锁，然后进行计算容器大小会导致效率低下。</p>
+<p>在累加count发生变化的几率非常小，所以ConcurrentHashMap的做法是先尝试2次通过不锁住Segment的方式统计各个Segment大小。<strong>如果统计的过程中，容器的count发生变化，则再采用加锁的方式来统计所有Segment大小。</strong></p>
+<p>ConcurrentHashMap是如何判断容器再进行计算大小的时候是否发生变化？使用modCount变量，在put、remove和clear方法里操作元素前都会将modCount变量加1，那么在统计size前后比较modCount是否发生变化，从而得知容器大小是否发生变化<strong>（也就是安全失败机制 fail-fast机制）</strong></p>
+<h2 id="参考资料："><a href="#参考资料：" class="headerlink" title="参考资料："></a>参考资料：</h2><ul>
+<li>方腾飞：《Java并发编程的艺术》 </li>
+</ul>
+
+      
+    </div>
+    <div class="article-footer">
+      <blockquote class="mt-2x">
+  <ul class="post-copyright list-unstyled">
+    
+    <li class="post-copyright-link hidden-xs">
+      <strong>本文链接：</strong>
+      <a href="https://aaccompany.github.io/2020/02/03/Java并发容器和框架/" title="Java并发容器和框架（第六章）" target="_blank" rel="external">https://aaccompany.github.io/2020/02/03/Java并发容器和框架/</a>
+    </li>
+    
+    <li class="post-copyright-license">
+      <strong>版权声明： </strong> 本博客所有文章除特别声明外，均采用 <a href="http://creativecommons.org/licenses/by/4.0/deed.zh" target="_blank" rel="external">CC BY 4.0 CN协议</a> 许可协议。转载请注明出处！
+    </li>
+  </ul>
+</blockquote>
+
+
+<div class="panel panel-default panel-badger">
+  <div class="panel-body">
+    <figure class="media">
+      <div class="media-left">
+        <a href="https://github.com/Aaccompany" target="_blank" class="img-burn thumb-sm visible-lg">
+          <img src="/images/avatar.jpg" class="img-rounded w-full" alt="">
+        </a>
+      </div>
+      <div class="media-body">
+        <h3 class="media-heading"><a href="https://github.com/Aaccompany" target="_blank"><span class="text-dark">Accompany</span><small class="ml-1x">Java Developer &amp; Accompany my lover</small></a></h3>
+        <div>这个人很赖，还没有写什么信息。</div>
+      </div>
+    </figure>
+  </div>
+</div>
+
+
+    </div>
+  </article>
+  
+    
+  <section id="comments">
+  	
+
+    
+  </section>
+
+
+  
+</div>
+
+  <nav class="bar bar-footer clearfix" data-stick-bottom>
+  <div class="bar-inner">
+  
+  <ul class="pager pull-left">
+    
+    <li class="prev">
+      <a href="/2020/02/05/HashMap解析/" title="HashMap 解析"><i class="icon icon-angle-left" aria-hidden="true"></i><span>&nbsp;&nbsp;上一篇</span></a>
+    </li>
+    
+    
+    <li class="next">
+      <a href="/2020/02/03/Java并发机制的底层实现原理/" title="Java并发机制的底层实现原理（第二章）"><span>下一篇&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
+    </li>
+    
+    
+  </ul>
+  
+  
+  <!-- Button trigger modal -->
+  <button type="button" class="btn btn-fancy btn-donate pop-onhover bg-gradient-warning" data-toggle="modal" data-target="#donateModal"><span>赏</span></button>
+  <!-- <div class="wave-icon wave-icon-danger btn-donate" data-toggle="modal" data-target="#donateModal">
+    <div class="wave-circle"><span class="icon"><i class="icon icon-bill"></i></span></div>
+  </div> -->
+  
+  
+  <div class="bar-right">
+    
+    <div class="share-component" data-sites="weibo,qq,wechat,facebook,twitter" data-mobile-sites="weibo,qq,qzone"></div>
+    
+  </div>
+  </div>
+</nav>
+  
+<!-- Modal -->
+<div class="modal modal-center modal-small modal-xs-full fade" id="donateModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content donate">
+      <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      <div class="modal-body">
+        <div class="donate-box">
+          <div class="donate-head">
+            <p>感谢您的支持，我会继续努力的!</p>
+          </div>
+          <div class="tab-content">
+            <div role="tabpanel" class="tab-pane fade active in" id="alipay">
+              <div class="donate-payimg">
+                <img src="/images/donate/alipayimg.png" alt="扫码支持" title="扫一扫" />
+              </div>
+              <p class="text-muted mv">扫码打赏，你说多少就多少</p>
+              <p class="text-grey">打开支付宝扫一扫，即可进行扫码打赏哦</p>
+            </div>
+            <div role="tabpanel" class="tab-pane fade" id="wechatpay">
+              <div class="donate-payimg">
+                <img src="/images/donate/wechatpayimg.png" alt="扫码支持" title="扫一扫" />
+              </div>
+              <p class="text-muted mv">扫码打赏，你说多少就多少</p>
+              <p class="text-grey">打开微信扫一扫，即可进行扫码打赏哦</p>
+            </div>
+          </div>
+          <div class="donate-footer">
+            <ul class="nav nav-tabs nav-justified" role="tablist">
+              <li role="presentation" class="active">
+                <a href="#alipay" id="alipay-tab" role="tab" data-toggle="tab" aria-controls="alipay" aria-expanded="true"><i class="icon icon-alipay"></i> 支付宝</a>
+              </li>
+              <li role="presentation" class="">
+                <a href="#wechatpay" role="tab" id="wechatpay-tab" data-toggle="tab" aria-controls="wechatpay" aria-expanded="false"><i class="icon icon-wepay"></i> 微信支付</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+</main>
+
+  <footer class="footer" itemscope itemtype="http://schema.org/WPFooter">
+	
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/Aaccompany" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li>
+        
+    </ul>
+
+    <div class="copyright">
+    	
+		<p>风雨里做个大人，阳光下做个孩子</p>
+    </div>
+</footer>
+  <script src="//cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+<script>
+window.jQuery || document.write('<script src="js/jquery.min.js"><\/script>')
+</script>
+<script src="/js/plugin.min.js"></script>
+<script src="/js/application.js"></script>
+
+    <script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+<script src="/js/insight.js"></script>
+
+
+    <script>
+(function ($) {
+    $('.search-form').on('submit', function (e) {
+        var keyword = $('.search-form-input[name="wd"]').val();
+        window.location = 'https://www.baidu.com/s?wd=site:aaccompany.github.io ' + keyword;
+        return false;
+    });
+})(jQuery);
+</script>
+
+
+
+
+   
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+   
+    
+<script src="//cdn.jsdelivr.net/npm/gitment@0.0.3/dist/gitment.browser.min.js"></script>
+<script>
+var gitment = new Gitment({
+  // id默认为当前页面url，如果url后带参数或锚点，gitment要重新初始化
+  // https://github.com/imsun/gitment/issues/55
+  // 解决方案：id:window.location.pathname,或者将id设置为当前页面标题
+  id: 'Java并发容器和框架（第六章）', 
+  owner: 'Aaccompany', // 可以是你的GitHub用户名，也可以是github id
+  repo: 'git@github.com:Aaccompany/Aaccompany.github.io.git',
+  oauth: {
+    client_id: '96da4c9e4c6434dd4399',
+    client_secret: '4edee086fa4203e9f67a9d19155c9ec5d803ca88',
+  }
+})
+gitment.render('comments')
+</script>
+
+
+
+
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="utf-8">
+  
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="format-detection" content="telephone=no,email=no,adress=no">
+  <!-- Color theme for statusbar -->
+  <meta name="theme-color" content="#000000">
+  <!-- 强制页面在当前窗口以独立页面显示,防止别人在框架里调用页面 -->
+  <meta http-equiv="window-target" content="_top">
+  
+  
+  <title>HashMap 解析 | 熊熊的家</title>
+  <meta name="description" content="浅析HashMap问题HashMap的数据结构HashMap数据结构是由数组和链表构成，具体可以表示为下图。 每个数组存储的位置的数据结构为key-value，这个结构在JDK7中称之为Entity在JDK8中称之为节点  put(&amp;#39;key&amp;#39;,value)执行步骤  通过内置Hash函数计算Key值然后取模于数组长度得出存储位置 然后将key-value存储到对应数组位置上  pu">
+<meta name="keywords" content="Map集合">
+<meta property="og:type" content="article">
+<meta property="og:title" content="HashMap 解析">
+<meta property="og:url" content="https://aaccompany.github.io/2020/02/05/HashMap解析/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="浅析HashMap问题HashMap的数据结构HashMap数据结构是由数组和链表构成，具体可以表示为下图。 每个数组存储的位置的数据结构为key-value，这个结构在JDK7中称之为Entity在JDK8中称之为节点  put(&amp;#39;key&amp;#39;,value)执行步骤  通过内置Hash函数计算Key值然后取模于数组长度得出存储位置 然后将key-value存储到对应数组位置上  pu">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://aaccompany.github.io/2020/02/05/HashMap解析/1.jpg">
+<meta property="og:image" content="https://aaccompany.github.io/2020/02/05/HashMap解析/2.jpg">
+<meta property="og:image" content="https://aaccompany.github.io/2020/02/05/HashMap解析/5.jpg">
+<meta property="og:image" content="https://aaccompany.github.io/2020/02/05/HashMap解析/6.jpg">
+<meta property="og:image" content="https://aaccompany.github.io/2020/02/05/HashMap解析/7.jpg">
+<meta property="og:image" content="https://aaccompany.github.io/2020/02/05/HashMap解析/8.jpg">
+<meta property="og:image" content="https://aaccompany.github.io/2020/02/05/HashMap解析/4.jpg">
+<meta property="og:image" content="https://aaccompany.github.io/2020/02/05/HashMap解析/9.jpg">
+<meta property="og:image" content="https://aaccompany.github.io/2020/02/05/HashMap解析/10.jpg">
+<meta property="og:image" content="https://aaccompany.github.io/2020/02/05/HashMap解析/11.jpg">
+<meta property="og:updated_time" content="2020-02-06T10:48:46.551Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="HashMap 解析">
+<meta name="twitter:description" content="浅析HashMap问题HashMap的数据结构HashMap数据结构是由数组和链表构成，具体可以表示为下图。 每个数组存储的位置的数据结构为key-value，这个结构在JDK7中称之为Entity在JDK8中称之为节点  put(&amp;#39;key&amp;#39;,value)执行步骤  通过内置Hash函数计算Key值然后取模于数组长度得出存储位置 然后将key-value存储到对应数组位置上  pu">
+<meta name="twitter:image" content="https://aaccompany.github.io/2020/02/05/HashMap解析/1.jpg">
+  <!-- Canonical links -->
+  <link rel="canonical" href="https://aaccompany.github.io/2020/02/05/HashMap解析/index.html">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png" type="image/x-icon">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+  
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitment@0.0.3/style/default.min.css">
+  
+  
+  
+</head>
+
+
+<body class="main-center theme-black" itemscope itemtype="http://schema.org/WebPage">
+  <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+  <div class="slimContent">
+    <div class="navbar-header">
+      
+      
+      <div class="profile-block text-center">
+        <a id="avatar" href="https://github.com/Aaccompany" target="_blank">
+          <img class="img-circle img-rotate" src="/images/avatar.jpg" width="200" height="200">
+        </a>
+        <h2 id="name" class="hidden-xs hidden-sm">Accompany</h2>
+        <h3 id="title" class="hidden-xs hidden-sm hidden-md">Java Developer &amp; Accompany my lover</h3>
+        <small id="location" class="text-muted hidden-xs hidden-sm"><i class="icon icon-map-marker"></i> Shenzhen, China</small>
+      </div>
+      
+      <div class="search" id="search-form-wrap">
+
+    <form class="search-form sidebar-form">
+        <div class="input-group">
+            <input type="text" class="search-form-input form-control" placeholder="搜索" />
+            <span class="input-group-btn">
+                <button type="submit" class="search-form-submit btn btn-flat" onclick="return false;"><i class="icon icon-search"></i></button>
+            </span>
+        </div>
+    </form>
+    <div class="ins-search">
+  <div class="ins-search-mask"></div>
+  <div class="ins-search-container">
+    <div class="ins-input-wrapper">
+      <input type="text" class="ins-search-input" placeholder="想要查找什么..." x-webkit-speech />
+      <button type="button" class="close ins-close ins-selectable" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+    </div>
+    <div class="ins-section-wrapper">
+      <div class="ins-section-container"></div>
+    </div>
+  </div>
+</div>
+
+
+</div>
+      <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#main-navbar" aria-controls="main-navbar" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <nav id="main-navbar" class="collapse navbar-collapse" itemscope itemtype="http://schema.org/SiteNavigationElement" role="navigation">
+      <ul class="nav navbar-nav main-nav ">
+        
+        
+        <li class="menu-item menu-item-home">
+          <a href="/.">
+            
+            <i class="icon icon-home-fill"></i>
+            
+            <span class="menu-title">首页</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives">
+            
+            <i class="icon icon-archives-fill"></i>
+            
+            <span class="menu-title">归档</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories">
+            
+            <i class="icon icon-folder"></i>
+            
+            <span class="menu-title">分类</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags">
+            
+            <i class="icon icon-tags"></i>
+            
+            <span class="menu-title">标签</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-repository">
+          <a href="/repository">
+            
+            <i class="icon icon-project"></i>
+            
+            <span class="menu-title">项目</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about">
+            
+            <i class="icon icon-cup-fill"></i>
+            
+            <span class="menu-title">关于</span>
+          </a>
+        </li>
+        
+      </ul>
+      
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/Aaccompany" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li>
+        
+    </ul>
+
+    </nav>
+  </div>
+</header>
+
+  
+    <aside class="sidebar" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    
+      <div class="widget">
+    <h3 class="widget-title">公告</h3>
+    <div class="widget-body">
+        <div id="board">
+            <div class="content">
+                <p>君子生非异也，善假于物也。<br> 故不积跬步，无以至千里；不积小流，无以成江海。 </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget-body">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Java集合类/">Java集合类</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/MQ/">MQ</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/后端框架/">后端框架</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/多线程编程系列/">多线程编程系列</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/杂谈/">杂谈</a><span class="category-list-count">1</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget-body">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Map集合/">Map集合</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/多线程编程/">多线程编程</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/杂谈/">杂谈</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/消息中间件/">消息中间件</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/重走系列/">重走系列</a><span class="tag-list-count">2</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget-body tagcloud">
+      <a href="/tags/Map集合/" style="font-size: 13px;">Map集合</a> <a href="/tags/spring/" style="font-size: 13.33px;">spring</a> <a href="/tags/多线程编程/" style="font-size: 14px;">多线程编程</a> <a href="/tags/杂谈/" style="font-size: 13px;">杂谈</a> <a href="/tags/消息中间件/" style="font-size: 13.67px;">消息中间件</a> <a href="/tags/重走系列/" style="font-size: 13.33px;">重走系列</a>
+    </div>
+  </div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget-body">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/02/">二月 2020</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/01/">一月 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/07/">七月 2019</a><span class="archive-list-count">6</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget-body">
+      <ul class="recent-post-list list-unstyled no-thumbnail">
+        
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/多线程编程系列/">多线程编程系列</a>
+              </p>
+              <p class="item-title">
+                <a href="/2020/02/12/Java中的线程池/" class="title">Java中的线程池（第九章）</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2020-02-11T16:00:00.000Z" itemprop="datePublished">2020-02-12</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/Java集合类/">Java集合类</a>
+              </p>
+              <p class="item-title">
+                <a href="/2020/02/05/HashMap解析/" class="title">HashMap 解析</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2020-02-04T16:00:00.000Z" itemprop="datePublished">2020-02-05</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/多线程编程系列/">多线程编程系列</a>
+              </p>
+              <p class="item-title">
+                <a href="/2020/02/03/Java并发容器和框架/" class="title">Java并发容器和框架（第六章）</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2020-02-02T16:00:00.000Z" itemprop="datePublished">2020-02-03</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/多线程编程系列/">多线程编程系列</a>
+              </p>
+              <p class="item-title">
+                <a href="/2020/02/03/Java并发机制的底层实现原理/" class="title">Java并发机制的底层实现原理（第二章）</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2020-02-02T16:00:00.000Z" itemprop="datePublished">2020-02-03</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/多线程编程系列/">多线程编程系列</a>
+              </p>
+              <p class="item-title">
+                <a href="/2020/01/31/并发编程的挑战/" class="title">并发编程的挑战（第一章）</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2020-01-30T16:00:00.000Z" itemprop="datePublished">2020-01-31</time>
+              </p>
+            </div>
+          </li>
+          
+      </ul>
+    </div>
+  </div>
+  
+
+    
+  </div>
+</aside>
+
+  
+  
+<main class="main" role="main">
+  <div class="content">
+  <article id="post-HashMap解析" class="article article-type-post" itemscope itemtype="http://schema.org/BlogPosting">
+    
+    <div class="article-header">
+      
+        
+  
+    <h1 class="article-title" itemprop="name">
+      HashMap 解析
+    </h1>
+  
+
+      
+      <div class="article-meta">
+        <span class="article-date">
+    <i class="icon icon-calendar-check"></i>
+	<a href="/2020/02/05/HashMap解析/" class="article-date">
+	  <time datetime="2020-02-04T16:00:00.000Z" itemprop="datePublished">2020-02-05</time>
+	</a>
+</span>
+        
+  <span class="article-category">
+    <i class="icon icon-folder"></i>
+    <a class="article-category-link" href="/categories/Java集合类/">Java集合类</a>
+  </span>
+
+        
+  <span class="article-tag">
+    <i class="icon icon-tags"></i>
+	<a class="article-tag-link" href="/tags/Map集合/">Map集合</a>
+  </span>
+
+
+        
+	<span class="article-read hidden-xs">
+	    <i class="icon icon-eye-fill" aria-hidden="true"></i>
+	    <span id="busuanzi_container_page_pv">
+			<span id="busuanzi_value_page_pv">0</span>
+		</span>
+	</span>
+
+
+        <span class="post-comment"><i class="icon icon-comment"></i> <a href="/2020/02/05/HashMap解析/#comments" class="article-comment-link">评论</a></span>
+        
+	
+		<span class="post-wordcount hidden-xs" itemprop="wordCount">字数统计: 1.2k(字)</span>
+	
+	
+		<span class="post-readcount hidden-xs" itemprop="timeRequired">阅读时长: 4(分)</span>
+	
+
+      </div>
+    </div>
+    <div class="article-entry marked-body" itemprop="articleBody">
+      
+        <h1 id="浅析HashMap问题"><a href="#浅析HashMap问题" class="headerlink" title="浅析HashMap问题"></a>浅析HashMap问题</h1><h2 id="HashMap的数据结构"><a href="#HashMap的数据结构" class="headerlink" title="HashMap的数据结构"></a>HashMap的数据结构</h2><p>HashMap数据结构是由数组和链表构成，具体可以表示为下图。</p>
+<p>每个数组存储的位置的数据结构为key-value，这个结构在JDK7中称之为Entity在JDK8中称之为节点</p>
+<p><img src="/2020/02/05/HashMap解析/1.jpg" alt></p>
+<p><strong><code>put(&#39;key&#39;,value)</code>执行步骤</strong></p>
+<ul>
+<li>通过内置Hash函数计算Key值然后取模于数组长度得出存储位置</li>
+<li>然后将key-value存储到对应数组位置上</li>
+</ul>
+<p><strong><code>put</code>方法执行过程待解决问题</strong></p>
+<ul>
+<li>用hash函数对Key进行计算并且取模于数组长度是有可能出现计算值重复，导致插入到数组的同一个位置。</li>
+<li>在数组中有限的长度，如果插入大量的数据会使得HashMap与list没有区别了，并且也无法解决hash值计算重复的问题</li>
+<li>根据以上的问题，也可以发现为什么HashMap要引入链表结构了</li>
+</ul>
+<p><strong>HashMap链表结构</strong></p>
+<p>每个节点会存在指向下一个节点的指针</p>
+<p><img src="/2020/02/05/HashMap解析/2.jpg" alt></p>
+<h2 id="链表如何插入？"><a href="#链表如何插入？" class="headerlink" title="链表如何插入？"></a>链表如何插入？</h2><p>JDK7之前新值是替换原有值，然后原有值添加到链表中，也就是头插法</p>
+<p>JDK8开始时改为尾插入新节点</p>
+<h2 id="HashMap是如何扩容？"><a href="#HashMap是如何扩容？" class="headerlink" title="HashMap是如何扩容？"></a>HashMap是如何扩容？</h2><ul>
+<li><p><strong>HashMap的扩容机制</strong></p>
+<p>因为采用的是数组链表机制，数组容量有限，并且链表长到一定长度的话会降低访问效率，所以需要存在扩容机制</p>
+</li>
+<li><p>什么时候扩容（resize）？内部存在两个元素会影响扩容</p>
+<p>1）<code>Capacity</code> : HashMap的容器大小</p>
+<p>2）<code>LoadFactor</code> : 负载因子，默认为<code>0.75f</code></p>
+</li>
+<li><p>什么是负载因子？有什么用？</p>
+<p>负载因子是告诉HashMap什么时候可以扩容</p>
+<p>例如：负载因子<code>0.75f</code> , <code>Capacity</code>为100，当容器存储元素到达了75个再插入第76个的时候就会出发扩容机制</p>
+</li>
+<li><p>如何扩容？</p>
+<p>1）创建新的<code>Entity</code>数组，大小为原来的两倍</p>
+<p>2）遍历全部元素重新计算Hash值，然后添加到新的数组中</p>
+<ul>
+<li><p>为什么不直接将数据复制过去 而是重新计算Hash值呢？</p>
+<p>因为数据长度发生变化了，<code>Hash的公式---&gt; index = HashCode（Key） &amp; （Length - 1）</code> ，这就会导致存储的位置不对了，最后想要通过Key去获取value也会失败</p>
+</li>
+</ul>
+</li>
+<li><h3 id="为什么到JDK8链表便从头插换到尾插？"><a href="#为什么到JDK8链表便从头插换到尾插？" class="headerlink" title="为什么到JDK8链表便从头插换到尾插？"></a><strong>为什么到JDK8链表便从头插换到尾插？</strong></h3><p><strong>put流程重要代码</strong></p>
+<p>  1）首先hashmap进行元素的插入，在元素个数达到阀值时： </p>
+<p><img src="/2020/02/05/HashMap解析/5.jpg" alt></p>
+<p>  2) addEntry对判断桶有没有达到阀值，达到阀值就会走resize方法： </p>
+<p><img src="/2020/02/05/HashMap解析/6.jpg" alt></p>
+<p>   3) resize方法里调用transfer方法转移元素： </p>
+<p><img src="/2020/02/05/HashMap解析/7.jpg" alt></p>
+<p>  4) 将每个节点数据转移到新的数组中，而HashMap中出现死循环问题也是下面的代码逻辑上不合理</p>
+<p><img src="/2020/02/05/HashMap解析/8.jpg" alt></p>
+<p><strong>单线程环境</strong></p>
+<p><code>resize</code>会重新计算Hash值并且添加回新的Table数组中，<code>resize</code>会将之前的链表顺序逆转，并且不会出现安全问题</p>
+<p><img src="/2020/02/05/HashMap解析/4.jpg" alt></p>
+<p><strong>多线程环境</strong></p>
+<p>环境：系统中存在两个线程同时插入元素并且同时使HashMap发生扩容</p>
+<p>线程A：执行到了下图状态</p>
+<p>线程B：对HashMap扩容完成</p>
+<p><img src="/2020/02/05/HashMap解析/9.jpg" alt></p>
+<p>线程A继续执行代码，则会出现下图</p>
+<p><img src="/2020/02/05/HashMap解析/10.jpg" alt></p>
+<p><img src="/2020/02/05/HashMap解析/11.jpg" alt></p>
+<p>这时候在内存中就会出现环状链表，后面进行<code>get()</code>的时候就会出现死循环，所以这也是头插入在多线程中出现的问题。</p>
+<p><strong>为什么采用尾插入，能够解决多线程扩容发生死循环问题（不能解决多线程数据安全问题）</strong></p>
+<p>​    如果使用链表使用尾插入则在扩容的时候不会发生逆序的现象，自然也不会出现多线程环境下成环的情况</p>
+</li>
+</ul>
+<h2 id="为什么HashMap默认初始化大小为16？"><a href="#为什么HashMap默认初始化大小为16？" class="headerlink" title="为什么HashMap默认初始化大小为16？"></a>为什么HashMap默认初始化大小为16？</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">    * The default initial capacity - MUST be a power of two.</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">   <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> DEFAULT_INITIAL_CAPACITY = <span class="number">1</span> &lt;&lt; <span class="number">4</span>; <span class="comment">// aka 16</span></span><br></pre></td></tr></table></figure>
+
+<p>阿里巴巴开发手册中也提到了，HashMap的初始长度最好设置为2的整数幂，哪怕传递非2的整数幂在内部也会向下取值，那么这么做的好处是什么</p>
+<p>之前提到过，再每次调用put方法的时候，需要计算key的哈希值然后插入到对应位置上。</p>
+<p><code>Hash的公式---&gt; index = HashCode（Key） &amp; （Length - 1）</code> </p>
+<p>假设<code>Length= 16</code>那么<code>Length-1=15</code>转化为二进制就是<code>1111</code>当一个Hash值与 <code>1111</code>做运算的时候，就等于Hash值的低四位。那么只需要保证哈希函数能够平均分配，那么计算出来的<code>index</code>值也是平均分配。</p>
+<p>所以采用<code>Length</code>等于2的整数幂值就能够实现均匀分配</p>
+
+      
+    </div>
+    <div class="article-footer">
+      <blockquote class="mt-2x">
+  <ul class="post-copyright list-unstyled">
+    
+    <li class="post-copyright-link hidden-xs">
+      <strong>本文链接：</strong>
+      <a href="https://aaccompany.github.io/2020/02/05/HashMap解析/" title="HashMap 解析" target="_blank" rel="external">https://aaccompany.github.io/2020/02/05/HashMap解析/</a>
+    </li>
+    
+    <li class="post-copyright-license">
+      <strong>版权声明： </strong> 本博客所有文章除特别声明外，均采用 <a href="http://creativecommons.org/licenses/by/4.0/deed.zh" target="_blank" rel="external">CC BY 4.0 CN协议</a> 许可协议。转载请注明出处！
+    </li>
+  </ul>
+</blockquote>
+
+
+<div class="panel panel-default panel-badger">
+  <div class="panel-body">
+    <figure class="media">
+      <div class="media-left">
+        <a href="https://github.com/Aaccompany" target="_blank" class="img-burn thumb-sm visible-lg">
+          <img src="/images/avatar.jpg" class="img-rounded w-full" alt="">
+        </a>
+      </div>
+      <div class="media-body">
+        <h3 class="media-heading"><a href="https://github.com/Aaccompany" target="_blank"><span class="text-dark">Accompany</span><small class="ml-1x">Java Developer &amp; Accompany my lover</small></a></h3>
+        <div>这个人很赖，还没有写什么信息。</div>
+      </div>
+    </figure>
+  </div>
+</div>
+
+
+    </div>
+  </article>
+  
+    
+  <section id="comments">
+  	
+
+    
+  </section>
+
+
+  
+</div>
+
+  <nav class="bar bar-footer clearfix" data-stick-bottom>
+  <div class="bar-inner">
+  
+  <ul class="pager pull-left">
+    
+    <li class="prev">
+      <a href="/2020/02/12/Java中的线程池/" title="Java中的线程池（第九章）"><i class="icon icon-angle-left" aria-hidden="true"></i><span>&nbsp;&nbsp;上一篇</span></a>
+    </li>
+    
+    
+    <li class="next">
+      <a href="/2020/02/03/Java并发容器和框架/" title="Java并发容器和框架（第六章）"><span>下一篇&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
+    </li>
+    
+    
+  </ul>
+  
+  
+  <!-- Button trigger modal -->
+  <button type="button" class="btn btn-fancy btn-donate pop-onhover bg-gradient-warning" data-toggle="modal" data-target="#donateModal"><span>赏</span></button>
+  <!-- <div class="wave-icon wave-icon-danger btn-donate" data-toggle="modal" data-target="#donateModal">
+    <div class="wave-circle"><span class="icon"><i class="icon icon-bill"></i></span></div>
+  </div> -->
+  
+  
+  <div class="bar-right">
+    
+    <div class="share-component" data-sites="weibo,qq,wechat,facebook,twitter" data-mobile-sites="weibo,qq,qzone"></div>
+    
+  </div>
+  </div>
+</nav>
+  
+<!-- Modal -->
+<div class="modal modal-center modal-small modal-xs-full fade" id="donateModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content donate">
+      <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      <div class="modal-body">
+        <div class="donate-box">
+          <div class="donate-head">
+            <p>感谢您的支持，我会继续努力的!</p>
+          </div>
+          <div class="tab-content">
+            <div role="tabpanel" class="tab-pane fade active in" id="alipay">
+              <div class="donate-payimg">
+                <img src="/images/donate/alipayimg.png" alt="扫码支持" title="扫一扫" />
+              </div>
+              <p class="text-muted mv">扫码打赏，你说多少就多少</p>
+              <p class="text-grey">打开支付宝扫一扫，即可进行扫码打赏哦</p>
+            </div>
+            <div role="tabpanel" class="tab-pane fade" id="wechatpay">
+              <div class="donate-payimg">
+                <img src="/images/donate/wechatpayimg.png" alt="扫码支持" title="扫一扫" />
+              </div>
+              <p class="text-muted mv">扫码打赏，你说多少就多少</p>
+              <p class="text-grey">打开微信扫一扫，即可进行扫码打赏哦</p>
+            </div>
+          </div>
+          <div class="donate-footer">
+            <ul class="nav nav-tabs nav-justified" role="tablist">
+              <li role="presentation" class="active">
+                <a href="#alipay" id="alipay-tab" role="tab" data-toggle="tab" aria-controls="alipay" aria-expanded="true"><i class="icon icon-alipay"></i> 支付宝</a>
+              </li>
+              <li role="presentation" class="">
+                <a href="#wechatpay" role="tab" id="wechatpay-tab" data-toggle="tab" aria-controls="wechatpay" aria-expanded="false"><i class="icon icon-wepay"></i> 微信支付</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+</main>
+
+  <footer class="footer" itemscope itemtype="http://schema.org/WPFooter">
+	
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/Aaccompany" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li>
+        
+    </ul>
+
+    <div class="copyright">
+    	
+		<p>风雨里做个大人，阳光下做个孩子</p>
+    </div>
+</footer>
+  <script src="//cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+<script>
+window.jQuery || document.write('<script src="js/jquery.min.js"><\/script>')
+</script>
+<script src="/js/plugin.min.js"></script>
+<script src="/js/application.js"></script>
+
+    <script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+<script src="/js/insight.js"></script>
+
+
+    <script>
+(function ($) {
+    $('.search-form').on('submit', function (e) {
+        var keyword = $('.search-form-input[name="wd"]').val();
+        window.location = 'https://www.baidu.com/s?wd=site:aaccompany.github.io ' + keyword;
+        return false;
+    });
+})(jQuery);
+</script>
+
+
+
+
+   
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+   
+    
+<script src="//cdn.jsdelivr.net/npm/gitment@0.0.3/dist/gitment.browser.min.js"></script>
+<script>
+var gitment = new Gitment({
+  // id默认为当前页面url，如果url后带参数或锚点，gitment要重新初始化
+  // https://github.com/imsun/gitment/issues/55
+  // 解决方案：id:window.location.pathname,或者将id设置为当前页面标题
+  id: 'HashMap 解析', 
+  owner: 'Aaccompany', // 可以是你的GitHub用户名，也可以是github id
+  repo: 'git@github.com:Aaccompany/Aaccompany.github.io.git',
+  oauth: {
+    client_id: '96da4c9e4c6434dd4399',
+    client_secret: '4edee086fa4203e9f67a9d19155c9ec5d803ca88',
+  }
+})
+gitment.render('comments')
+</script>
+
+
+
+
+
+
+
+
+
+</body>
+</html>
